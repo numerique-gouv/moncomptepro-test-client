@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import { generators, Issuer } from "openid-client";
 import cookieSession from "cookie-session";
+import morgan from "morgan";
 
 const app = express();
 const port = 3000;
@@ -13,12 +14,12 @@ app.use(
     keys: ["key1", "key2"],
   }),
 );
+app.use(morgan("combined"));
 
 const redirectUri = `http://${process.env.HOST}:${process.env.PORT}${process.env.CALLBACK_URL}`;
 
 const getMcpClient = async () => {
   const mcpIssuer = await Issuer.discover(process.env.MCP_PROVIDER);
-  console.log("Discovered issuer %s", mcpIssuer.issuer);
 
   return new mcpIssuer.Client({
     client_id: process.env.MCP_CLIENT_ID,
@@ -54,11 +55,8 @@ app.get("/login-callback", async (req, res) => {
   const tokenSet = await client.callback(redirectUri, params, {
     code_verifier: req.session.verifier,
   });
-  console.log("received and validated tokens %j", tokenSet);
-  console.log("validated ID Token claims %j", tokenSet.claims());
 
   const userinfo = await client.userinfo(tokenSet.access_token);
-  console.log("userinfo %j", userinfo);
 
   res.render("index", {
     userinfo: JSON.stringify(userinfo, null, 2),
@@ -68,5 +66,5 @@ app.get("/login-callback", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`App listening on port ${port}`);
 });
