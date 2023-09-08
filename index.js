@@ -25,8 +25,10 @@ const getMcpClient = async () => {
     client_id: process.env.MCP_CLIENT_ID,
     client_secret: process.env.MCP_CLIENT_SECRET,
     redirect_uris: [redirectUri],
-    response_types: ["code"], // id_token_signed_response_alg (default "RS256")
-    // token_endpoint_auth_method (default "client_secret_basic")
+    response_types: ["code"],
+    id_token_signed_response_alg: process.env.MCP_ID_TOKEN_SIGNED_RESPONSE_ALG,
+    userinfo_signed_response_alg:
+      process.env.MCP_USERINFO_SIGNED_RESPONSE_ALG || null,
   });
 };
 
