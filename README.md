@@ -4,7 +4,7 @@ This is a minimal, nodeJS-based MonComptePro client, to be used for end-to-end t
 
 ## Prerequisites
 
-This projet uses NodeJS v16 or higher.
+This projet uses Node.js v16 or higher.
 
 ## Installation
 
