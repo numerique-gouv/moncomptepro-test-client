@@ -4,8 +4,11 @@ import { generators, Issuer } from "openid-client";
 import cookieSession from "cookie-session";
 import morgan from "morgan";
 
-const app = express();
 const port = parseInt(process.env.PORT, 10) || 3000;
+const origin = `${process.env.HOST}`;
+const redirectUri = `${origin}${process.env.CALLBACK_URL}`;
+
+const app = express();
 
 app.set("view engine", "ejs");
 app.use(
@@ -15,9 +18,6 @@ app.use(
   }),
 );
 app.use(morgan("combined"));
-
-const origin = `${process.env.PROTOCOL}://${process.env.HOST}:${process.env.PORT}`;
-const redirectUri = `${origin}${process.env.CALLBACK_URL}`;
 
 const getMcpClient = async () => {
   const mcpIssuer = await Issuer.discover(process.env.MCP_PROVIDER);

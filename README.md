@@ -14,7 +14,7 @@ This tool is full configured using environment variables.
 
 Pull the image:
 ```
-docker pull ghcr.io/rdubigny/moncomptepro-test-client
+docker pull rdubigny/moncomptepro-test-client
 ```
 
 Run the container:
@@ -22,7 +22,7 @@ Run the container:
 docker run -d --rm \
 -p 3000:3000 \
 -e PORT=3000 \
-ghcr.io/rdubigny/moncomptepro-test-client
+rdubigny/moncomptepro-test-client
 ```
 
 ## Run it with Docker Compose
@@ -33,7 +33,7 @@ version: '3.5'
 
 services:
   oidc-test-client:
-    image: rdubigny/moncomptepro-test-client # ghcr.io/beryju/oidc-test-client
+    image: rdubigny/moncomptepro-test-client
     ports:
       - 3000:3000
     environment:
