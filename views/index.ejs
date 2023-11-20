@@ -35,12 +35,6 @@
             </a>
         </p>
     </div>
-    <h2>Changer d’organisation</h2>
-    <div>
-        <form action="/select-organization" method="post">
-            <button id="select-organization">changer d’organisation</button>
-        </form>
-    </div>
     <% if (locals.userinfo) { %>
         <h2>Information utilisateur</h2>
         <pre><code><%= locals.userinfo %></code></pre>
@@ -53,11 +47,21 @@
         <h2>OAuth2 Token</h2>
         <pre><code><%= locals.oauth2token %></code></pre>
     <% } %>
-    <h2>Déconnexion</h2>
-    <div>
-        <form action="/logout" method="post">
-            <button id="logout">Se déconnecter</button>
-        </form>
-    </div>
+    <h2>Interactions</h2>
+    <form action="/logout" method="post">
+        <button id="logout">Se déconnecter</button>
+    </form>
+    <br>
+    <form action="/select-organization" method="post">
+        <button id="select-organization">Changer d’organisation</button>
+    </form>
+    <br>
+    <form action="/update-userinfo" method="post">
+        <button id="update-userinfo">Mettre à jour mes informations</button>
+    </form>
+    <br>
+    <footer>
+        <p>Source: <a href="https://github.com/betagouv/moncomptepro">github.com/betagouv/moncomptepro</a></p>
+    </footer>
 </body>
 </html>
