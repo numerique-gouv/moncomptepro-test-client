@@ -10,10 +10,6 @@ It also tests the `select_organization` MonComptePro prompt.
 
 This tool is full configured using environment variables.
 
-## Configuration
-
-Available env variables and there default values are listed [here](.env).
-
 ## Run it with Docker
 
 Pull the image:
@@ -24,10 +20,8 @@ docker pull ghcr.io/rdubigny/moncomptepro-test-client
 Run the container:
 ```
 docker run -d --rm \
--p 9009:9009 \
--e MCP_CLIENT_ID=test-id \
--e MCP_CLIENT_SECRET=test-secret \
--e MCP_PROVIDER: https://app-test.moncomptepro.beta.gouv.fr... \
+-p 3000:3000 \
+-e PORT=3000 \
 ghcr.io/rdubigny/moncomptepro-test-client
 ```
 
@@ -41,16 +35,9 @@ services:
   oidc-test-client:
     image: rdubigny/moncomptepro-test-client # ghcr.io/beryju/oidc-test-client
     ports:
-      - 9009:9009
+      - 3000:3000
     environment:
-      SITE_TITLE: Mon site
-      STYLESHEET_URL: https://unpkg.com/axist@latest/dist/axist.min.css
-      PORT: 9009
-      MCP_CLIENT_ID: test-id
-      MCP_CLIENT_SECRET: test-secret
-      MCP_PROVIDER: https://app-test.moncomptepro.beta.gouv.fr
-      MCP_SCOPES: openid email organization
-      CALLBACK_URL: /auth/callback
+      PORT: 3000
 ```
 
 Run the container:
@@ -69,3 +56,18 @@ Run the server:
 ```
 npm start
 ```
+
+## Configuration
+
+Available env variables and there default values are listed [here](.env).
+
+You can use the app-test.moncomptepro.beta.gouv.fr oidc provider with the following client configuration:
+```yaml
+client_id: client_id
+client_secret: client_secret
+login_callbacks: ['http://localhost:3000/login-callback']
+logout_callbacks: ['http://localhost:3000/']
+authorized_scopes: openid email profile organization',
+```
+
+More clients are available at: https://github.com/betagouv/moncomptepro/blob/master/scripts/fixtures.sql
