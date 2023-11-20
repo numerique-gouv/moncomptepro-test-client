@@ -26,7 +26,7 @@
     <h2>Se connecter</h2>
     <div>
         <form action="/login" method="post">
-            <button class="moncomptepro-button"></button>
+            <button id="login" class="moncomptepro-button"></button>
         </form>
         <p>
             <a href="https://moncomptepro.beta.gouv.fr/" target="_blank" rel="noopener noreferrer"
@@ -38,7 +38,7 @@
     <h2>Changer d’organisation</h2>
     <div>
         <form action="/select-organization" method="post">
-            <button>changer d’organisation</button>
+            <button id="select-organization">changer d’organisation</button>
         </form>
     </div>
     <% if (locals.userinfo) { %>
@@ -56,7 +56,7 @@
     <h2>Déconnexion</h2>
     <div>
         <form action="/logout" method="post">
-            <button>Se déconnecter</button>
+            <button id="logout">Se déconnecter</button>
         </form>
     </div>
 </body>
