@@ -6,7 +6,7 @@ It uses the https://github.com/panva/node-openid-client Library for the actual O
 
 This tool can be used to test the traditional Authorization Code Flow.
 
-It also tests the `select_organization` MonComptePro prompt.
+It also uses the `select_organization` & `update_userinfo` MonComptePro prompts.
 
 This tool is full configured using environment variables.
 
@@ -67,7 +67,7 @@ client_id: client_id
 client_secret: client_secret
 login_callbacks: ['http://localhost:3000/login-callback']
 logout_callbacks: ['http://localhost:3000/']
-authorized_scopes: openid email profile organization',
+authorized_scopes: openid email profile organization
 ```
 
 More clients are available at: https://github.com/betagouv/moncomptepro/blob/master/scripts/fixtures.sql
