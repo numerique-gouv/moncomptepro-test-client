@@ -16,7 +16,7 @@ app.use(
 );
 app.use(morgan("combined"));
 
-const origin = `http://${process.env.HOST}:${process.env.PORT}`;
+const origin = `${process.env.PROTOCOL}://${process.env.HOST}:${process.env.PORT}`;
 const redirectUri = `${origin}${process.env.CALLBACK_URL}`;
 
 const getMcpClient = async () => {
