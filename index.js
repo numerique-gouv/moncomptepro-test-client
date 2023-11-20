@@ -37,6 +37,7 @@ app.get("/", async (req, res, next) => {
   try {
     res.render("index", {
       title: process.env.SITE_TITLE,
+      stylesheet_url: process.env.STYLESHEET_URL,
       userinfo: JSON.stringify(req.session.userinfo, null, 2),
       idtoken: JSON.stringify(req.session.idtoken, null, 2),
       oauth2token: JSON.stringify(req.session.oauth2token, null, 2),
@@ -54,7 +55,7 @@ app.post("/login", async (req, res, next) => {
     const code_challenge = generators.codeChallenge(code_verifier);
 
     const redirectUrl = client.authorizationUrl({
-      scope: process.env.MCP_SCOPES.replaceAll(",", " "),
+      scope: process.env.MCP_SCOPES,
       code_challenge,
       code_challenge_method: "S256",
       login_hint: process.env.LOGIN_HINT,
@@ -92,10 +93,10 @@ app.post("/select-organization", async (req, res, next) => {
     const code_challenge = generators.codeChallenge(code_verifier);
 
     const redirectUrl = client.authorizationUrl({
-      // scope: process.env.MCP_SCOPES.replaceAll(",", " "),
+      scope: process.env.MCP_SCOPES,
       code_challenge,
       code_challenge_method: "S256",
-      prompt: "select-organization",
+      prompt: "select_organization",
     });
 
     res.redirect(redirectUrl);
