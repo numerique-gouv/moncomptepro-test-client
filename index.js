@@ -139,6 +139,26 @@ app.post("/logout", async (req, res, next) => {
   }
 });
 
+app.post("/force-login", async (req, res, next) => {
+  try {
+    const client = await getMcpClient();
+    const code_verifier = generators.codeVerifier();
+    req.session.verifier = code_verifier;
+    const code_challenge = generators.codeChallenge(code_verifier);
+
+    const redirectUrl = client.authorizationUrl({
+      scope: process.env.MCP_SCOPES,
+      code_challenge,
+      code_challenge_method: "S256",
+      prompt: "login",
+    });
+
+    res.redirect(redirectUrl);
+  } catch (e) {
+    next(e);
+  }
+});
+
 app.listen(port, () => {
   console.log(`App listening on port ${port}`);
   console.log(process.env);
