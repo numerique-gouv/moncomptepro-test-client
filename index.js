@@ -148,9 +148,12 @@ app.post("/force-login", async (req, res, next) => {
 
     const redirectUrl = client.authorizationUrl({
       scope: process.env.MCP_SCOPES,
+      claims: { id_token: { auth_time: { essential: true } } },
       code_challenge,
       code_challenge_method: "S256",
       prompt: "login",
+      // alternatively, you can use the 'max_age: 0'
+      // if so, claims parameter is not necessary as auth_time will be returned
     });
 
     res.redirect(redirectUrl);
