@@ -28,5 +28,9 @@
   "type": "module",
   "devDependencies": {
     "prettier": "^3.0.3"
+  },
+  "engines": {
+    "node": "20",
+    "npm": ">=9"
   }
 }
