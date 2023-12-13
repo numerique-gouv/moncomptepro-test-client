@@ -1,19 +1,31 @@
-FROM node:16
+#
 
-# Create app directory
+FROM oven/bun:1 as base
+
 WORKDIR /usr/src/app
 
-# Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
-COPY package*.json ./
+#
 
-RUN npm install
-# If you are building your code for production
-# RUN npm ci --omit=dev
+FROM base AS install
 
-# Bundle app source
+RUN mkdir -p /temp/prod
+COPY package.json bun.lockb /temp/prod/
+RUN cd /temp/prod && bun install --frozen-lockfile --production
+
+#
+
+FROM base AS prerelease
+
 COPY . .
 
-EXPOSE 3000
-CMD [ "npm", "start" ]
+#
+
+FROM base AS release
+
+COPY --from=install /temp/prod/node_modules node_modules
+COPY --from=prerelease /usr/src/app/index.ts .
+COPY --from=prerelease /usr/src/app/package.json .
+
+USER bun
+EXPOSE 3000/tcp
+ENTRYPOINT [ "bun", "run", "index.ts" ]

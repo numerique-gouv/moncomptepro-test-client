@@ -1,14 +1,14 @@
 {
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "test": "cypress run",
-    "start": "cd .. && npm start"
-  },
   "devDependencies": {
     "@badeball/cypress-cucumber-preprocessor": "^19.2.0",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.0",
     "cypress": "^13.6.1",
     "typescript": "^5.3.3"
-  }
+  },
+  "private": true,
+  "scripts": {
+    "test": "cypress run",
+    "start": "cd .. && npm start"
+  },
+  "type": "module"
 }

@@ -4,6 +4,10 @@ import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor";
 
 //
 
+Cypress.Cookies.debug(true);
+
+//
+
 Given("je navigue sur la page", () => {
   cy.visit("/");
 });
@@ -28,7 +32,7 @@ When("je vois {string} sur moncomptepro", (_text: string) => {
     { args: _text },
     (text) => {
       cy.contains(text);
-    }
+    },
   );
 });
 
@@ -38,7 +42,7 @@ When("je click sur {string} sur moncomptepro", (_text: string) => {
     { args: _text },
     (text) => {
       cy.contains(text).click();
-    }
+    },
   );
 });
 
@@ -54,5 +58,5 @@ When(
         .contains("Se connecter")
         .click();
     });
-  }
+  },
 );
