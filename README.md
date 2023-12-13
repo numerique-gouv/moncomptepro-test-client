@@ -13,11 +13,13 @@ This tool is full configured using environment variables.
 ## Run it with Docker
 
 Pull the image:
+
 ```
 docker pull rdubigny/moncomptepro-test-client
 ```
 
 Run the container:
+
 ```
 docker run -d --rm \
 -p 3000:3000 \
@@ -28,8 +30,9 @@ rdubigny/moncomptepro-test-client
 ## Run it with Docker Compose
 
 In `docker-compose.yml`:
+
 ```yaml
-version: '3.5'
+version: "3.5"
 
 services:
   oidc-test-client:
@@ -41,6 +44,7 @@ services:
 ```
 
 Run the container:
+
 ```
 docker-compose up
 ```
@@ -48,11 +52,13 @@ docker-compose up
 ## Run it with Node.js v16 or higher
 
 Install the dependencies:
+
 ```
 npm i
 ```
 
 Run the server:
+
 ```
 npm start
 ```
@@ -62,11 +68,12 @@ npm start
 Available env variables and there default values are listed [here](.env).
 
 You can use the app-test.moncomptepro.beta.gouv.fr oidc provider with the following client configuration:
+
 ```yaml
 client_id: client_id
 client_secret: client_secret
-login_callbacks: ['http://localhost:3000/login-callback']
-logout_callbacks: ['http://localhost:3000/']
+login_callbacks: ["http://localhost:3000/login-callback"]
+logout_callbacks: ["http://localhost:3000/"]
 authorized_scopes: openid email profile organization
 ```
 
