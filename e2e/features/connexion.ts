@@ -32,7 +32,7 @@ When("je vois {string} sur moncomptepro", (_text: string) => {
     { args: _text },
     (text) => {
       cy.contains(text);
-    }
+    },
   );
 });
 
@@ -42,7 +42,7 @@ When("je click sur {string} sur moncomptepro", (_text: string) => {
     { args: _text },
     (text) => {
       cy.contains(text).click();
-    }
+    },
   );
 });
 
@@ -58,5 +58,5 @@ When(
         .contains("Se connecter")
         .click();
     });
-  }
+  },
 );
