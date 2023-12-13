@@ -15,7 +15,7 @@ app.use(
   cookieSession({
     name: "mcp_session",
     keys: ["key1", "key2"],
-  }),
+  })
 );
 app.use(morgan("combined"));
 
