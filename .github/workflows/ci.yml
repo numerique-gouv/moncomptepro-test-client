@@ -12,18 +12,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          cache: "npm"
-          node-version-file: package.json
-      - run: npm ci
-      - run: timout 1 npm start
+      - uses: oven-sh/setup-bun@v1
+      - run: bun install
+      - run: timout 1 bun run start
 
   e2e:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: npm ci
+      - uses: oven-sh/setup-bun@v1
+      - run: bun install
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:
