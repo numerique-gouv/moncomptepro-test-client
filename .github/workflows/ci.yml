@@ -17,6 +17,7 @@ jobs:
           cache: "npm"
           node-version-file: package.json
       - run: npm ci
+      - run: timout 1 npm start
 
   e2e:
     runs-on: ubuntu-latest

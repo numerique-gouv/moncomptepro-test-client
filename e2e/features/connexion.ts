@@ -4,6 +4,10 @@ import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor";
 
 //
 
+Cypress.Cookies.debug(true);
+
+//
+
 Given("je navigue sur la page", () => {
   cy.visit("/");
 });
