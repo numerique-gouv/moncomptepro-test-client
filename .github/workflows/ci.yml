@@ -11,9 +11,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           cache: "npm"
           node-version-file: package.json
       - run: npm ci
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+        with:
+          working-directory: ./e2e
+          start: npm start
+          wait-on: http://localhost:3000
