@@ -2,5 +2,6 @@
   "extends": "@tsconfig/bun/tsconfig.json",
   "compilerOptions": {
     "verbatimModuleSyntax": true
-  }
+  },
+  "files": ["./index.ts", "./views/index.ts"]
 }
