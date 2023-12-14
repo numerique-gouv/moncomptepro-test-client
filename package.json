@@ -21,22 +21,19 @@
   },
   "homepage": "https://github.com/betagouv/moncomptepro-test-client#readme",
   "dependencies": {
-    "@fastify/cookie": "^9.2.0",
-    "@fastify/formbody": "^7.4.0",
-    "@fastify/session": "^10.7.0",
-    "@fastify/view": "^8.2.0",
-    "ejs": "^3.1.9",
-    "fastify": "^4.25.0",
-    "fastify-error-page": "^4.0.0",
+    "hono": "^3.11.7",
+    "hono-sessions": "^0.3.3",
     "openid-client": "^5.6.1",
     "youch": "^3.3.3",
     "zod": "^3.22.4"
   },
   "devDependencies": {
     "@tsconfig/bun": "^1.0.1",
-    "@types/ejs": "^3.1.5",
-    "bun-types": "^1.0.17",
+    "bun-types": "^1.0.18",
     "prettier": "^3.1.1"
+  },
+  "overrides": {
+    "hono": "3.11.7"
   },
   "engines": {
     "node": "20",
