@@ -3,5 +3,5 @@
   "compilerOptions": {
     "verbatimModuleSyntax": true
   },
-  "files": ["./index.ts", "./views/index.ts"]
+  "files": ["./index.ts"]
 }

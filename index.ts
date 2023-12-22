@@ -29,7 +29,7 @@ const env = z
     MCP_SCOPES: z.string().default("openid email profile organization"),
     MCP_USERINFO_SIGNED_RESPONSE_ALG: z.string().optional(),
     PORT: z.coerce.number().default(3000),
-    SITE_TITLE: z.string().default("Bonjour monde !"),
+    SITE_TITLE: z.string().default("Bonjour monde !"),
     STYLESHEET_URL: z.string().default("https://unpkg.com/bamboo.css"),
   })
   .parse(process_env);
@@ -55,6 +55,7 @@ interface Session_Context extends Env {
     };
   };
 }
+
 const hono = new Hono<Session_Context>();
 
 //
