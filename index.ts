@@ -1,11 +1,8 @@
 //
 
-import fastify_cookie, { type FastifyCookieOptions } from "@fastify/cookie";
-import fastify_formbody from "@fastify/formbody";
-import fastify_session, { type FastifySessionOptions } from "@fastify/session";
-import pointOfView from "@fastify/view";
-import ejs from "ejs";
-import Fastify from "fastify";
+import { Hono, type Env } from "hono";
+import { CookieStore, Session, sessionMiddleware } from "hono-sessions";
+import { logger } from "hono/logger";
 import { ok } from "node:assert";
 import { env as process_env } from "node:process";
 import {
@@ -16,6 +13,7 @@ import {
 } from "openid-client";
 import Youch from "youch";
 import { z } from "zod";
+import { Index } from "./views";
 
 //
 
@@ -31,7 +29,7 @@ const env = z
     MCP_SCOPES: z.string().default("openid email profile organization"),
     MCP_USERINFO_SIGNED_RESPONSE_ALG: z.string().optional(),
     PORT: z.coerce.number().default(3000),
-    SITE_TITLE: z.string().default("Bonjour monde !"),
+    SITE_TITLE: z.string().default("Bonjour monde !"),
     STYLESHEET_URL: z.string().default("https://unpkg.com/bamboo.css"),
   })
   .parse(process_env);
@@ -40,40 +38,61 @@ const redirectUri = `${env.HOST}${env.CALLBACK_URL}`;
 
 //
 
-const fastify = Fastify({ logger: true });
-fastify.register(pointOfView, { engine: { ejs } });
-fastify.register(fastify_formbody);
-fastify.register(fastify_cookie, {} as FastifyCookieOptions);
-
-declare module "fastify" {
-  interface Session {
-    verifier: string;
-    userinfo: string;
-    idtoken: IdTokenClaims;
-    oauth2token: TokenSet;
-  }
+interface Session_Context extends Env {
+  Variables: {
+    session: Session & {
+      get(key: "verifier"): string;
+      set(key: "verifier", value: string): void;
+    } & {
+      get(key: "userinfo"): string;
+      set(key: "userinfo", value: string): void;
+    } & {
+      get(key: "idtoken"): IdTokenClaims;
+      set(key: "idtoken", value: IdTokenClaims): void;
+    } & {
+      get(key: "oauth2token"): TokenSet;
+      set(key: "oauth2token", value: TokenSet): void;
+    };
+  };
 }
 
-fastify.register(fastify_session, {
-  cookieName: "mcp_session",
-  secret: ["key1", "key2"],
-  cookie: { secure: "auto" },
-} as FastifySessionOptions);
+const hono = new Hono<Session_Context>();
 
-fastify.get("/", function (req, reply) {
-  reply.view("/views/index.ejs", {
-    title: env.SITE_TITLE,
-    stylesheet_url: env.STYLESHEET_URL,
-    userinfo: JSON.stringify(req.session.userinfo, null, 2),
-    idtoken: JSON.stringify(req.session.idtoken, null, 2),
-    oauth2token: JSON.stringify(req.session.oauth2token, null, 2),
-  });
+//
+
+hono.use("*", logger());
+
+hono.use(
+  "*",
+  sessionMiddleware({
+    store: new CookieStore(),
+    encryptionKey: "a secret with minimum length of 32 characters",
+    sessionCookieName: "mcp_session",
+  }),
+);
+
+//
+
+hono.get("/", ({ html, get }) => {
+  const session = get("session") || new Session();
+
+  return html(
+    Index({
+      title: env.SITE_TITLE,
+      stylesheet_url: env.STYLESHEET_URL,
+      userinfo: session.get("userinfo"),
+      idtoken: session.get("idtoken"),
+      oauth2token: session.get("oauth2token"),
+    }),
+  );
 });
 
-fastify.post("/login", async function (req, reply) {
+hono.post("/login", async function ({ redirect, get }) {
+  const session = get("session");
+
   const client = await getMcpClient();
   const code_verifier = generators.codeVerifier();
-  req.session.verifier = code_verifier;
+  session.set("verifier", code_verifier);
 
   const code_challenge = generators.codeChallenge(code_verifier);
 
@@ -84,29 +103,31 @@ fastify.post("/login", async function (req, reply) {
     login_hint: env.LOGIN_HINT,
   });
 
-  reply.redirect(redirectUrl);
+  return redirect(redirectUrl);
 });
 
-fastify.get(env.CALLBACK_URL, async function (req, reply) {
+hono.get(env.CALLBACK_URL, async function ({ req, redirect, get }) {
+  const session = get("session");
   const client = await getMcpClient();
-  const params = client.callbackParams(req.raw);
+  const params = client.callbackParams(req.raw.url);
   const tokenSet = await client.callback(redirectUri, params, {
-    code_verifier: req.session.verifier,
+    code_verifier: session.get("verifier") as string,
   });
 
   ok(tokenSet.access_token, "Missing tokenSet.access_token");
 
-  req.session.userinfo = await client.userinfo(tokenSet.access_token);
-  req.session.idtoken = tokenSet.claims();
-  req.session.oauth2token = tokenSet;
+  session.set("userinfo", await client.userinfo(tokenSet.access_token));
+  session.set("idtoken", tokenSet.claims());
+  session.set("oauth2token", tokenSet);
 
-  reply.redirect("/");
+  return redirect("/");
 });
 
-fastify.post("/select-organization", async function (req, reply) {
+hono.post("/select-organization", async function ({ req, redirect, get }) {
+  const session = get("session");
   const client = await getMcpClient();
   const code_verifier = generators.codeVerifier();
-  req.session.verifier = code_verifier;
+  session.set("verifier", code_verifier);
   const code_challenge = generators.codeChallenge(code_verifier);
 
   const redirectUrl = client.authorizationUrl({
@@ -116,13 +137,14 @@ fastify.post("/select-organization", async function (req, reply) {
     prompt: "select_organization",
   });
 
-  reply.redirect(redirectUrl);
+  return redirect(redirectUrl);
 });
 
-fastify.post("/update-userinfo", async (req, reply) => {
+hono.post("/update-userinfo", async ({ get, redirect }) => {
+  const session = get("session");
   const client = await getMcpClient();
   const code_verifier = generators.codeVerifier();
-  req.session.verifier = code_verifier;
+  session.set("verifier", code_verifier);
   const code_challenge = generators.codeChallenge(code_verifier);
 
   const redirectUrl = client.authorizationUrl({
@@ -132,23 +154,26 @@ fastify.post("/update-userinfo", async (req, reply) => {
     prompt: "update_userinfo",
   });
 
-  reply.redirect(redirectUrl);
+  return redirect(redirectUrl);
 });
 
-fastify.post("/logout", async (req, reply) => {
-  await req.session.destroy();
+hono.post("/logout", async ({ get, redirect }) => {
+  const session = get("session");
+  session.deleteSession();
+
   const client = await getMcpClient();
   const redirectUrl = client.endSessionUrl({
     post_logout_redirect_uri: `${env.HOST}/`,
   });
 
-  reply.redirect(redirectUrl);
+  return redirect(redirectUrl);
 });
 
-fastify.post("/force-login", async (req, reply) => {
+hono.post("/force-login", async ({ get, redirect }) => {
+  const session = get("session");
   const client = await getMcpClient();
   const code_verifier = generators.codeVerifier();
-  req.session.verifier = code_verifier;
+  session.set("verifier", code_verifier);
   const code_challenge = generators.codeChallenge(code_verifier);
 
   const redirectUrl = client.authorizationUrl({
@@ -161,23 +186,15 @@ fastify.post("/force-login", async (req, reply) => {
     // if so, claims parameter is not necessary as auth_time will be returned
   });
 
-  reply.redirect(redirectUrl);
+  return redirect(redirectUrl);
 });
 
-fastify.setErrorHandler(async function (error, request, reply) {
-  try {
-    const youch = new Youch(error, request.raw);
-    const html = await youch.toHTML();
-    reply.type("text/html").send(html);
-  } catch (error) {
-    reply.send(error);
-  }
+hono.onError(async (error, { html, req }) => {
+  const youch = new Youch(error, req.raw);
+  return html(await youch.toHTML());
 });
 
-fastify.listen({ port: env.PORT }, () => {
-  console.log(`App listening on port ${env.PORT}`);
-  console.log(env);
-});
+export default hono;
 
 //
 
