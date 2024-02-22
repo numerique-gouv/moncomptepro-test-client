@@ -67,7 +67,7 @@ npm start
 
 Available env variables and there default values are listed [here](.env).
 
-You can use the app-test.moncomptepro.beta.gouv.fr oidc provider with the following client configuration:
+You can use the app-sandbox.moncomptepro.beta.gouv.fr oidc provider with the following client configuration:
 
 ```yaml
 client_id: client_id
