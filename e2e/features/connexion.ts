@@ -23,36 +23,28 @@ Then("je vois {string}", function (text: string) {
 //
 
 When("je vois {string} sur moncomptepro", (_text: string) => {
-  cy.origin(
-    "https://app-test.moncomptepro.beta.gouv.fr",
-    { args: _text },
-    (text) => {
-      cy.contains(text);
-    }
-  );
+  cy.origin(Cypress.env("MCP_PROVIDER"), { args: _text }, (text) => {
+    cy.contains(text);
+  });
 });
 
 When("je click sur {string} sur moncomptepro", (_text: string) => {
-  cy.origin(
-    "https://app-test.moncomptepro.beta.gouv.fr",
-    { args: _text },
-    (text) => {
-      cy.contains(text).click();
-    }
-  );
+  cy.origin(Cypress.env("MCP_PROVIDER"), { args: _text }, (text) => {
+    cy.contains(text).click();
+  });
 });
 
 When(
   "je me connecte en tant que user@yopmail.com sur moncomptepro",
   (path: string) => {
-    cy.origin("https://app-test.moncomptepro.beta.gouv.fr", () => {
+    cy.origin(Cypress.env("MCP_PROVIDER"), () => {
       cy.get('[name="login"]').type("user@yopmail.com");
       cy.get('[type="submit"]').click();
 
       cy.get('[name="password"]').type("user@yopmail.com");
       cy.get('[action="/users/sign-in"]  [type="submit"]')
-        .contains("Se connecter")
+        .contains("S’identifier")
         .click();
     });
-  }
+  },
 );

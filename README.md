@@ -78,3 +78,11 @@ authorized_scopes: openid email profile organization
 ```
 
 More clients are available at: https://github.com/betagouv/moncomptepro/blob/master/scripts/fixtures.sql
+
+## Run Cypress test
+
+```
+cd e2e
+npm i
+npm test
+```
