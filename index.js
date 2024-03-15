@@ -15,7 +15,7 @@ app.use(
   cookieSession({
     name: "mcp_session",
     keys: ["key1", "key2"],
-  })
+  }),
 );
 app.use(morgan("combined"));
 
@@ -50,15 +50,15 @@ app.get("/", async (req, res, next) => {
 app.post("/login", async (req, res, next) => {
   try {
     const client = await getMcpClient();
-    const code_verifier = generators.codeVerifier();
-    req.session.verifier = code_verifier;
-    const code_challenge = generators.codeChallenge(code_verifier);
+    const acr_values = process.env.ACR_VALUES
+      ? process.env.ACR_VALUES.split(",")
+      : null;
 
     const redirectUrl = client.authorizationUrl({
       scope: process.env.MCP_SCOPES,
-      code_challenge,
-      code_challenge_method: "S256",
-      login_hint: process.env.LOGIN_HINT,
+      // claims: { id_token: { amr: { essential: true } } },
+      login_hint: process.env.LOGIN_HINT || null,
+      acr_values,
     });
 
     res.redirect(redirectUrl);
@@ -71,9 +71,7 @@ app.get(process.env.CALLBACK_URL, async (req, res, next) => {
   try {
     const client = await getMcpClient();
     const params = client.callbackParams(req);
-    const tokenSet = await client.callback(redirectUri, params, {
-      code_verifier: req.session.verifier,
-    });
+    const tokenSet = await client.callback(redirectUri, params);
 
     req.session.userinfo = await client.userinfo(tokenSet.access_token);
     req.session.idtoken = tokenSet.claims();
@@ -88,14 +86,10 @@ app.get(process.env.CALLBACK_URL, async (req, res, next) => {
 app.post("/select-organization", async (req, res, next) => {
   try {
     const client = await getMcpClient();
-    const code_verifier = generators.codeVerifier();
-    req.session.verifier = code_verifier;
-    const code_challenge = generators.codeChallenge(code_verifier);
 
     const redirectUrl = client.authorizationUrl({
       scope: process.env.MCP_SCOPES,
-      code_challenge,
-      code_challenge_method: "S256",
+      login_hint: process.env.LOGIN_HINT || null,
       prompt: "select_organization",
     });
 
@@ -108,14 +102,9 @@ app.post("/select-organization", async (req, res, next) => {
 app.post("/update-userinfo", async (req, res, next) => {
   try {
     const client = await getMcpClient();
-    const code_verifier = generators.codeVerifier();
-    req.session.verifier = code_verifier;
-    const code_challenge = generators.codeChallenge(code_verifier);
-
     const redirectUrl = client.authorizationUrl({
       scope: process.env.MCP_SCOPES,
-      code_challenge,
-      code_challenge_method: "S256",
+      login_hint: process.env.LOGIN_HINT || null,
       prompt: "update_userinfo",
     });
 
@@ -142,15 +131,11 @@ app.post("/logout", async (req, res, next) => {
 app.post("/force-login", async (req, res, next) => {
   try {
     const client = await getMcpClient();
-    const code_verifier = generators.codeVerifier();
-    req.session.verifier = code_verifier;
-    const code_challenge = generators.codeChallenge(code_verifier);
 
     const redirectUrl = client.authorizationUrl({
       scope: process.env.MCP_SCOPES,
       claims: { id_token: { auth_time: { essential: true } } },
-      code_challenge,
-      code_challenge_method: "S256",
+      login_hint: process.env.LOGIN_HINT || null,
       prompt: "login",
       // alternatively, you can use the 'max_age: 0'
       // if so, claims parameter is not necessary as auth_time will be returned
