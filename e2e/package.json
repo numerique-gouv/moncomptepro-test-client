@@ -2,13 +2,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "cypress run",
-    "start": "cd .. && npm start"
+    "start": "cd .. && npm start",
+    "test": "cypress run"
   },
   "devDependencies": {
-    "@badeball/cypress-cucumber-preprocessor": "^19.2.0",
+    "@badeball/cypress-cucumber-preprocessor": "^20.0.2",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.0",
-    "cypress": "^13.6.1",
-    "typescript": "^5.3.3"
-  }
+    "cypress": "^13.7.0",
+    "typescript": "^5.4.2"
+  },
+  "packageManager": "npm@10.5.0+sha256.17ca6e08e7633b624e8f870db81a78f46afe119de62bcaf0a7407574139198fc"
 }
