@@ -2,35 +2,36 @@
   "name": "moncomptepro-test-client",
   "version": "1.0.0",
   "description": "This is a minimal, nodeJS-based MonComptePro client, to be used for end-to-end testing.",
-  "main": "index.js",
-  "type": "module",
-  "scripts": {
-    "start": "node .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "homepage": "https://github.com/rdubigny/moncomptepro-test-client#readme",
+  "bugs": {
+    "url": "https://github.com/rdubigny/moncomptepro-test-client/issues"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rdubigny/moncomptepro-test-client.git"
   },
-  "author": "",
   "license": "AGPL-3.0",
-  "bugs": {
-    "url": "https://github.com/rdubigny/moncomptepro-test-client/issues"
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node .",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "homepage": "https://github.com/rdubigny/moncomptepro-test-client#readme",
   "dependencies": {
-    "cookie-session": "^2.0.0",
-    "dotenv": "^16.3.1",
+    "cookie-session": "^2.1.0",
+    "dotenv": "^16.4.5",
     "ejs": "^3.1.9",
-    "express": "^4.18.2",
+    "express": "^4.18.3",
     "morgan": "^1.10.0",
-    "openid-client": "^5.6.1"
+    "openid-client": "^5.6.5"
   },
   "devDependencies": {
-    "prettier": "^3.1.1"
+    "prettier": "^3.2.5"
   },
+  "packageManager": "npm@10.5.0+sha256.17ca6e08e7633b624e8f870db81a78f46afe119de62bcaf0a7407574139198fc",
   "engines": {
     "node": "20",
-    "npm": ">=9"
+    "npm": ">=10"
   }
 }
