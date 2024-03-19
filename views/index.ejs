@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width"/>
-    <title><%= locals.title %></title>
+    <title><%= locals.title %> - MonComptePro</title>
     <style>
         .moncomptepro-button {
             background-color: transparent !important;
@@ -20,50 +20,62 @@
         }
     </style>
     <link rel="stylesheet" href="<%= locals.stylesheet_url %>"/>
+    <style>
+        :root {
+            --b-link: #000091;
+        }
+        a {
+            text-decoration: underline;
+        }
+        a:hover, a:focus {
+            text-decoration: none;
+        }
+    </style>
 </head>
 <body>
-    <h1><%= locals.title %></h1>
-    <h2>Se connecter</h2>
-    <div>
-        <form action="/login" method="post">
-            <button id="login" class="moncomptepro-button"></button>
+    <main>
+        <h1><%= locals.title %></h1>
+        <h2>Se connecter</h2>
+        <div>
+            <form action="/login" method="post">
+                <button id="login" class="moncomptepro-button" aria-label="S'identifier avec MonComptePro"></button>
+            </form>
+            <p>
+                <a href="https://moncomptepro.beta.gouv.fr/" target="_blank" rel="noopener noreferrer"
+                title="Qu’est-ce que MonComptePro ? - nouvelle fenêtre">
+                    Qu’est-ce que MonComptePro ?
+                </a>
+            </p>
+        </div>
+        <% if (locals.userinfo) { %>
+            <h2>Information utilisateur</h2>
+            <pre><code><%= locals.userinfo %></code></pre>
+        <% } %>
+        <% if (locals.idtoken) { %>
+            <h2>ID Token</h2>
+            <pre><code><%= locals.idtoken %></code></pre>
+        <% } %>
+        <% if (locals.oauth2token) { %>
+            <h2>OAuth2 Token</h2>
+            <pre><code><%= locals.oauth2token %></code></pre>
+        <% } %>
+        <h2>Interactions</h2>
+        <form action="/logout" method="post">
+            <button id="logout">Se déconnecter</button>
         </form>
-        <p>
-            <a href="https://moncomptepro.beta.gouv.fr/" target="_blank" rel="noopener noreferrer"
-               title="Qu’est-ce que MonComptePro ? - nouvelle fenêtre">
-                Qu’est-ce que MonComptePro ?
-            </a>
-        </p>
-    </div>
-    <% if (locals.userinfo) { %>
-        <h2>Information utilisateur</h2>
-        <pre><code><%= locals.userinfo %></code></pre>
-    <% } %>
-    <% if (locals.idtoken) { %>
-        <h2>ID Token</h2>
-        <pre><code><%= locals.idtoken %></code></pre>
-    <% } %>
-    <% if (locals.oauth2token) { %>
-        <h2>OAuth2 Token</h2>
-        <pre><code><%= locals.oauth2token %></code></pre>
-    <% } %>
-    <h2>Interactions</h2>
-    <form action="/logout" method="post">
-        <button id="logout">Se déconnecter</button>
-    </form>
-    <br>
-    <form action="/select-organization" method="post">
-        <button id="select-organization">Changer d’organisation</button>
-    </form>
-    <br>
-    <form action="/update-userinfo" method="post">
-        <button id="update-userinfo">Mettre à jour mes informations</button>
-    </form>
-    <br>
-    <form action="/force-login" method="post">
-        <button id="force-login">Forcer une reconnexion</button>
-    </form>
-    <br>
+        <br>
+        <form action="/select-organization" method="post">
+            <button id="select-organization">Changer d’organisation</button>
+        </form>
+        <br>
+        <form action="/update-userinfo" method="post">
+            <button id="update-userinfo">Mettre à jour mes informations</button>
+        </form>
+        <br>
+        <form action="/force-login" method="post">
+            <button id="force-login">Forcer une reconnexion</button>
+        </form>
+    </main>
     <footer>
         <p>Source: <a href="https://github.com/betagouv/moncomptepro-test-client">github.com/betagouv/moncomptepro-test-client</a></p>
     </footer>
