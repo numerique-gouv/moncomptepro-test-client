@@ -19,6 +19,12 @@ app.use(
 );
 app.use(morgan("combined"));
 
+const acr_values = process.env.ACR_VALUES
+  ? process.env.ACR_VALUES.split(",")
+  : null;
+const login_hint = process.env.LOGIN_HINT || null;
+const scope = process.env.MCP_SCOPES;
+
 const getMcpClient = async () => {
   const mcpIssuer = await Issuer.discover(process.env.MCP_PROVIDER);
 
@@ -50,14 +56,11 @@ app.get("/", async (req, res, next) => {
 app.post("/login", async (req, res, next) => {
   try {
     const client = await getMcpClient();
-    const acr_values = process.env.ACR_VALUES
-      ? process.env.ACR_VALUES.split(",")
-      : null;
 
     const redirectUrl = client.authorizationUrl({
-      scope: process.env.MCP_SCOPES,
+      scope,
       // claims: { id_token: { amr: { essential: true } } },
-      login_hint: process.env.LOGIN_HINT || null,
+      login_hint,
       acr_values,
     });
 
@@ -88,8 +91,8 @@ app.post("/select-organization", async (req, res, next) => {
     const client = await getMcpClient();
 
     const redirectUrl = client.authorizationUrl({
-      scope: process.env.MCP_SCOPES,
-      login_hint: process.env.LOGIN_HINT || null,
+      scope,
+      login_hint,
       prompt: "select_organization",
     });
 
@@ -103,8 +106,8 @@ app.post("/update-userinfo", async (req, res, next) => {
   try {
     const client = await getMcpClient();
     const redirectUrl = client.authorizationUrl({
-      scope: process.env.MCP_SCOPES,
-      login_hint: process.env.LOGIN_HINT || null,
+      scope,
+      login_hint,
       prompt: "update_userinfo",
     });
 
@@ -133,9 +136,9 @@ app.post("/force-login", async (req, res, next) => {
     const client = await getMcpClient();
 
     const redirectUrl = client.authorizationUrl({
-      scope: process.env.MCP_SCOPES,
+      scope,
       claims: { id_token: { auth_time: { essential: true } } },
-      login_hint: process.env.LOGIN_HINT || null,
+      login_hint,
       prompt: "login",
       // alternatively, you can use the 'max_age: 0'
       // if so, claims parameter is not necessary as auth_time will be returned
