@@ -118,8 +118,7 @@ app.get(process.env.CALLBACK_URL, async (req, res, next) => {
     req.session.nonce = null;
     req.session.state = null;
     req.session.userinfo = await client.userinfo(tokenSet.access_token);
-    req.session.idtoken = tokenSet.claims();
-    req.session.oauth2token = tokenSet;
+    req.session.idtoken = tokenSet.claims()
     req.session.id_token_hint = tokenSet.id_token;
 
     res.redirect("/");
