@@ -1,8 +1,9 @@
 import "dotenv/config";
 import express from "express";
-import { generators, Issuer } from "openid-client";
+import { Issuer } from "openid-client";
 import cookieSession from "cookie-session";
 import morgan from "morgan";
+import * as crypto from "crypto";
 
 const port = parseInt(process.env.PORT, 10) || 3000;
 const origin = `${process.env.HOST}`;
@@ -56,12 +57,18 @@ app.get("/", async (req, res, next) => {
 app.post("/login", async (req, res, next) => {
   try {
     const client = await getMcpClient();
+    const nonce = crypto.randomBytes(16).toString("hex");
+    const state = crypto.randomBytes(16).toString("hex");
+    req.session.state = state;
+    req.session.nonce = nonce;
 
     const redirectUrl = client.authorizationUrl({
       scope,
       // claims: { id_token: { amr: { essential: true } } },
       login_hint,
       acr_values,
+      nonce,
+      state,
     });
 
     res.redirect(redirectUrl);
@@ -74,8 +81,13 @@ app.get(process.env.CALLBACK_URL, async (req, res, next) => {
   try {
     const client = await getMcpClient();
     const params = client.callbackParams(req);
-    const tokenSet = await client.callback(redirectUri, params);
+    const tokenSet = await client.callback(redirectUri, params, {
+      nonce: req.session.nonce,
+      state: req.session.state,
+    });
 
+    req.session.nonce = null;
+    req.session.state = null;
     req.session.userinfo = await client.userinfo(tokenSet.access_token);
     req.session.idtoken = tokenSet.claims();
     req.session.oauth2token = tokenSet;
@@ -134,6 +146,10 @@ app.post("/logout", async (req, res, next) => {
 app.post("/force-login", async (req, res, next) => {
   try {
     const client = await getMcpClient();
+    const nonce = crypto.randomBytes(16).toString("hex");
+    const state = crypto.randomBytes(16).toString("hex");
+    req.session.state = state;
+    req.session.nonce = nonce;
 
     const redirectUrl = client.authorizationUrl({
       scope,
@@ -142,6 +158,8 @@ app.post("/force-login", async (req, res, next) => {
       prompt: "login",
       // alternatively, you can use the 'max_age: 0'
       // if so, claims parameter is not necessary as auth_time will be returned
+      nonce,
+      state,
     });
 
     res.redirect(redirectUrl);
