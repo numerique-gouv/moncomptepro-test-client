@@ -12,6 +12,8 @@ export default defineConfig({
     baseUrl: "http://localhost:3000",
     specPattern: "**/*.feature",
     setupNodeEvents,
+    video: true,
+    videoCompression: 32,
     supportFile: false,
   },
   env: {

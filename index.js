@@ -1,8 +1,9 @@
 import "dotenv/config";
 import express from "express";
-import { generators, Issuer } from "openid-client";
+import { Issuer } from "openid-client";
 import cookieSession from "cookie-session";
 import morgan from "morgan";
+import * as crypto from "crypto";
 
 const port = parseInt(process.env.PORT, 10) || 3000;
 const origin = `${process.env.HOST}`;
@@ -41,74 +42,86 @@ app.get("/", async (req, res, next) => {
       userinfo: JSON.stringify(req.session.userinfo, null, 2),
       idtoken: JSON.stringify(req.session.idtoken, null, 2),
       oauth2token: JSON.stringify(req.session.oauth2token, null, 2),
+      showAgentConnectButton: process.env.SHOW_AGENTCONNECT_BUTTON === "true",
     });
   } catch (e) {
     next(e);
   }
 });
 
-app.post("/login", async (req, res, next) => {
-  try {
-    const client = await getMcpClient();
-    const acr_values = process.env.ACR_VALUES
-      ? process.env.ACR_VALUES.split(",")
-      : null;
+const getAuthorizationControllerFactory = (extraParams) => {
+  return async (req, res, next) => {
+    try {
+      const client = await getMcpClient();
+      const acr_values = process.env.ACR_VALUES
+        ? process.env.ACR_VALUES.split(",")
+        : null;
+      const login_hint = process.env.LOGIN_HINT || null;
+      const scope = process.env.MCP_SCOPES;
+      const nonce = crypto.randomBytes(16).toString("hex");
+      const state = crypto.randomBytes(16).toString("hex");
 
-    const redirectUrl = client.authorizationUrl({
-      scope: process.env.MCP_SCOPES,
-      // claims: { id_token: { amr: { essential: true } } },
-      login_hint: process.env.LOGIN_HINT || null,
-      acr_values,
-    });
+      req.session.state = state;
+      req.session.nonce = nonce;
 
-    res.redirect(redirectUrl);
-  } catch (e) {
-    next(e);
-  }
-});
+      const redirectUrl = client.authorizationUrl({
+        scope,
+        login_hint,
+        acr_values,
+        nonce,
+        state,
+        ...extraParams,
+      });
+
+      res.redirect(redirectUrl);
+    } catch (e) {
+      next(e);
+    }
+  };
+};
+
+app.post("/login", getAuthorizationControllerFactory());
+
+app.post(
+  "/select-organization",
+  getAuthorizationControllerFactory({
+    prompt: "select_organization",
+  }),
+);
+
+app.post(
+  "/update-userinfo",
+  getAuthorizationControllerFactory({
+    prompt: "update_userinfo",
+  }),
+);
+
+app.post(
+  "/force-login",
+  getAuthorizationControllerFactory({
+    claims: { id_token: { auth_time: { essential: true } } },
+    prompt: "login",
+    // alternatively, you can use the 'max_age: 0'
+    // if so, claims parameter is not necessary as auth_time will be returned
+  }),
+);
 
 app.get(process.env.CALLBACK_URL, async (req, res, next) => {
   try {
     const client = await getMcpClient();
     const params = client.callbackParams(req);
-    const tokenSet = await client.callback(redirectUri, params);
+    const tokenSet = await client.callback(redirectUri, params, {
+      nonce: req.session.nonce,
+      state: req.session.state,
+    });
 
+    req.session.nonce = null;
+    req.session.state = null;
     req.session.userinfo = await client.userinfo(tokenSet.access_token);
     req.session.idtoken = tokenSet.claims();
     req.session.oauth2token = tokenSet;
 
     res.redirect("/");
-  } catch (e) {
-    next(e);
-  }
-});
-
-app.post("/select-organization", async (req, res, next) => {
-  try {
-    const client = await getMcpClient();
-
-    const redirectUrl = client.authorizationUrl({
-      scope: process.env.MCP_SCOPES,
-      login_hint: process.env.LOGIN_HINT || null,
-      prompt: "select_organization",
-    });
-
-    res.redirect(redirectUrl);
-  } catch (e) {
-    next(e);
-  }
-});
-
-app.post("/update-userinfo", async (req, res, next) => {
-  try {
-    const client = await getMcpClient();
-    const redirectUrl = client.authorizationUrl({
-      scope: process.env.MCP_SCOPES,
-      login_hint: process.env.LOGIN_HINT || null,
-      prompt: "update_userinfo",
-    });
-
-    res.redirect(redirectUrl);
   } catch (e) {
     next(e);
   }
@@ -120,25 +133,6 @@ app.post("/logout", async (req, res, next) => {
     const client = await getMcpClient();
     const redirectUrl = client.endSessionUrl({
       post_logout_redirect_uri: `${origin}/`,
-    });
-
-    res.redirect(redirectUrl);
-  } catch (e) {
-    next(e);
-  }
-});
-
-app.post("/force-login", async (req, res, next) => {
-  try {
-    const client = await getMcpClient();
-
-    const redirectUrl = client.authorizationUrl({
-      scope: process.env.MCP_SCOPES,
-      claims: { id_token: { auth_time: { essential: true } } },
-      login_hint: process.env.LOGIN_HINT || null,
-      prompt: "login",
-      // alternatively, you can use the 'max_age: 0'
-      // if so, claims parameter is not necessary as auth_time will be returned
     });
 
     res.redirect(redirectUrl);
