@@ -129,10 +129,12 @@ app.get(process.env.CALLBACK_URL, async (req, res, next) => {
 
 app.post("/logout", async (req, res, next) => {
   try {
+    const id_token_hint = req.session.idtoken;
     req.session = null;
     const client = await getMcpClient();
     const redirectUrl = client.endSessionUrl({
       post_logout_redirect_uri: `${origin}/`,
+      id_token_hint,
     });
 
     res.redirect(redirectUrl);
