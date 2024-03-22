@@ -20,12 +20,6 @@ app.use(
 );
 app.use(morgan("combined"));
 
-const acr_values = process.env.ACR_VALUES
-  ? process.env.ACR_VALUES.split(",")
-  : null;
-const login_hint = process.env.LOGIN_HINT || null;
-const scope = process.env.MCP_SCOPES;
-
 const getMcpClient = async () => {
   const mcpIssuer = await Issuer.discover(process.env.MCP_PROVIDER);
 
@@ -54,28 +48,62 @@ app.get("/", async (req, res, next) => {
   }
 });
 
-app.post("/login", async (req, res, next) => {
-  try {
-    const client = await getMcpClient();
-    const nonce = crypto.randomBytes(16).toString("hex");
-    const state = crypto.randomBytes(16).toString("hex");
-    req.session.state = state;
-    req.session.nonce = nonce;
+const getAuthorizationControllerFactory = (extraParams) => {
+  return async (req, res, next) => {
+    try {
+      const client = await getMcpClient();
+      const acr_values = process.env.ACR_VALUES
+        ? process.env.ACR_VALUES.split(",")
+        : null;
+      const login_hint = process.env.LOGIN_HINT || null;
+      const scope = process.env.MCP_SCOPES;
+      const nonce = crypto.randomBytes(16).toString("hex");
+      const state = crypto.randomBytes(16).toString("hex");
 
-    const redirectUrl = client.authorizationUrl({
-      scope,
-      // claims: { id_token: { amr: { essential: true } } },
-      login_hint,
-      acr_values,
-      nonce,
-      state,
-    });
+      req.session.state = state;
+      req.session.nonce = nonce;
 
-    res.redirect(redirectUrl);
-  } catch (e) {
-    next(e);
-  }
-});
+      const redirectUrl = client.authorizationUrl({
+        scope,
+        login_hint,
+        acr_values,
+        nonce,
+        state,
+        ...extraParams,
+      });
+
+      res.redirect(redirectUrl);
+    } catch (e) {
+      next(e);
+    }
+  };
+};
+
+app.post("/login", getAuthorizationControllerFactory());
+
+app.post(
+  "/select-organization",
+  getAuthorizationControllerFactory({
+    prompt: "select_organization",
+  }),
+);
+
+app.post(
+  "/update-userinfo",
+  getAuthorizationControllerFactory({
+    prompt: "update_userinfo",
+  }),
+);
+
+app.post(
+  "/force-login",
+  getAuthorizationControllerFactory({
+    claims: { id_token: { auth_time: { essential: true } } },
+    prompt: "login",
+    // alternatively, you can use the 'max_age: 0'
+    // if so, claims parameter is not necessary as auth_time will be returned
+  }),
+);
 
 app.get(process.env.CALLBACK_URL, async (req, res, next) => {
   try {
@@ -98,68 +126,12 @@ app.get(process.env.CALLBACK_URL, async (req, res, next) => {
   }
 });
 
-app.post("/select-organization", async (req, res, next) => {
-  try {
-    const client = await getMcpClient();
-
-    const redirectUrl = client.authorizationUrl({
-      scope,
-      login_hint,
-      prompt: "select_organization",
-    });
-
-    res.redirect(redirectUrl);
-  } catch (e) {
-    next(e);
-  }
-});
-
-app.post("/update-userinfo", async (req, res, next) => {
-  try {
-    const client = await getMcpClient();
-    const redirectUrl = client.authorizationUrl({
-      scope,
-      login_hint,
-      prompt: "update_userinfo",
-    });
-
-    res.redirect(redirectUrl);
-  } catch (e) {
-    next(e);
-  }
-});
-
 app.post("/logout", async (req, res, next) => {
   try {
     req.session = null;
     const client = await getMcpClient();
     const redirectUrl = client.endSessionUrl({
       post_logout_redirect_uri: `${origin}/`,
-    });
-
-    res.redirect(redirectUrl);
-  } catch (e) {
-    next(e);
-  }
-});
-
-app.post("/force-login", async (req, res, next) => {
-  try {
-    const client = await getMcpClient();
-    const nonce = crypto.randomBytes(16).toString("hex");
-    const state = crypto.randomBytes(16).toString("hex");
-    req.session.state = state;
-    req.session.nonce = nonce;
-
-    const redirectUrl = client.authorizationUrl({
-      scope,
-      claims: { id_token: { auth_time: { essential: true } } },
-      login_hint,
-      prompt: "login",
-      // alternatively, you can use the 'max_age: 0'
-      // if so, claims parameter is not necessary as auth_time will be returned
-      nonce,
-      state,
     });
 
     res.redirect(redirectUrl);
