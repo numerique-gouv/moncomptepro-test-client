@@ -118,8 +118,9 @@ app.get(process.env.CALLBACK_URL, async (req, res, next) => {
     req.session.nonce = null;
     req.session.state = null;
     req.session.userinfo = await client.userinfo(tokenSet.access_token);
-    req.session.id_token = tokenSet.id_token;
+    req.session.idtoken = tokenSet.claims();
     req.session.oauth2token = tokenSet;
+    req.session.id_token_hint = tokenSet.id_token;
 
     res.redirect("/");
   } catch (e) {
@@ -129,7 +130,7 @@ app.get(process.env.CALLBACK_URL, async (req, res, next) => {
 
 app.post("/logout", async (req, res, next) => {
   try {
-    const id_token_hint = req.session.id_token;
+    const id_token_hint = req.session.id_token_hint;
     req.session = null;
     const client = await getMcpClient();
     const redirectUrl = client.endSessionUrl({
