@@ -42,6 +42,7 @@ app.get("/", async (req, res, next) => {
       userinfo: JSON.stringify(req.session.userinfo, null, 2),
       idtoken: JSON.stringify(req.session.idtoken, null, 2),
       oauth2token: JSON.stringify(req.session.oauth2token, null, 2),
+      showAgentConnectButton: process.env.SHOW_AGENTCONNECT_BUTTON === "true",
     });
   } catch (e) {
     next(e);
