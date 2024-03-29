@@ -1,19 +1,16 @@
-FROM node:20
+FROM node:20-alpine
 
-# Create app directory
-WORKDIR /usr/src/app
+RUN corepack enable
+WORKDIR /app
 
-# Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
-COPY package*.json ./
+COPY ./package*.json ./
 
-RUN npm install
-# If you are building your code for production
-# RUN npm ci --omit=dev
+RUN --mount=id=npm,type=cache,target=/root/.npm,sharing=locked \
+    npm install --omit=dev
 
-# Bundle app source
-COPY . .
+COPY ./.env index.js ./
+COPY ./views/ ./views/
 
-EXPOSE 3000
+USER node
+EXPOSE 3000/tcp
 CMD [ "npm", "start" ]
