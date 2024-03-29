@@ -16,7 +16,7 @@ app.use(
   cookieSession({
     name: "mcp_session",
     keys: ["key1", "key2"],
-  }),
+  })
 );
 app.use(morgan("combined"));
 
@@ -86,14 +86,14 @@ app.post(
   "/select-organization",
   getAuthorizationControllerFactory({
     prompt: "select_organization",
-  }),
+  })
 );
 
 app.post(
   "/update-userinfo",
   getAuthorizationControllerFactory({
     prompt: "update_userinfo",
-  }),
+  })
 );
 
 app.post(
@@ -103,7 +103,7 @@ app.post(
     prompt: "login",
     // alternatively, you can use the 'max_age: 0'
     // if so, claims parameter is not necessary as auth_time will be returned
-  }),
+  })
 );
 
 app.get(process.env.CALLBACK_URL, async (req, res, next) => {
@@ -118,7 +118,7 @@ app.get(process.env.CALLBACK_URL, async (req, res, next) => {
     req.session.nonce = null;
     req.session.state = null;
     req.session.userinfo = await client.userinfo(tokenSet.access_token);
-    req.session.idtoken = tokenSet.claims()
+    req.session.idtoken = tokenSet.claims();
     req.session.id_token_hint = tokenSet.id_token;
 
     res.redirect("/");
