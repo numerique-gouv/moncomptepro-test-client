@@ -29,7 +29,7 @@
   "devDependencies": {
     "prettier": "^3.2.5"
   },
-  "packageManager": "npm@10.5.0+sha256.17ca6e08e7633b624e8f870db81a78f46afe119de62bcaf0a7407574139198fc",
+  "packageManager": "npm@10.5.2+sha256.df0a1f7691654b94786013e5d5b80a873a7ffbae9c82c3bec8b5db76bc3b7dfd",
   "engines": {
     "node": "20",
     "npm": ">=10"
