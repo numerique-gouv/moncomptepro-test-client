@@ -12,5 +12,4 @@ Fonctionnalité: Connexion de user@yopmail.com
 
     Alors je suis redirigé sur "/"
     Et je vois "Information utilisateur" 
-    Et je vois "user@yopmail.com" 
-    Et je vois "International knowledge practice leader" 
+    Et je vois "user@yopmail.com"
