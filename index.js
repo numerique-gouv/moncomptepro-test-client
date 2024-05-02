@@ -14,9 +14,9 @@ const app = express();
 app.set("view engine", "ejs");
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
     name: "mcp_session",
-  })
+    secret: process.env.SESSION_SECRET,
+  }),
 );
 app.use(morgan("combined"));
 
@@ -86,14 +86,14 @@ app.post(
   "/select-organization",
   getAuthorizationControllerFactory({
     prompt: "select_organization",
-  })
+  }),
 );
 
 app.post(
   "/update-userinfo",
   getAuthorizationControllerFactory({
     prompt: "update_userinfo",
-  })
+  }),
 );
 
 app.post(
@@ -103,7 +103,7 @@ app.post(
     prompt: "login",
     // alternatively, you can use the 'max_age: 0'
     // if so, claims parameter is not necessary as auth_time will be returned
-  })
+  }),
 );
 
 app.get(process.env.CALLBACK_URL, async (req, res, next) => {
@@ -123,7 +123,6 @@ app.get(process.env.CALLBACK_URL, async (req, res, next) => {
     req.session.oauth2token = tokenSet;
     res.redirect("/");
   } catch (e) {
-    console.error(e)
     next(e);
   }
 });
@@ -131,7 +130,7 @@ app.get(process.env.CALLBACK_URL, async (req, res, next) => {
 app.post("/logout", async (req, res, next) => {
   try {
     const id_token_hint = req.session.id_token_hint;
-    req.session.destroy()
+    req.session.destroy();
     const client = await getMcpClient();
     const redirectUrl = client.endSessionUrl({
       post_logout_redirect_uri: `${origin}/`,
