@@ -16,6 +16,7 @@ app.use(
   session({
     name: "mcp_session",
     secret: process.env.SESSION_SECRET,
+    rolling: true,
   }),
 );
 app.use(morgan("combined"));
