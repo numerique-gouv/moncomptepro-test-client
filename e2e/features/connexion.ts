@@ -28,7 +28,7 @@ When("je vois {string} sur moncomptepro", (_text: string) => {
   });
 });
 
-When("je click sur {string} sur moncomptepro", (_text: string) => {
+When("je clique sur {string} sur moncomptepro", (_text: string) => {
   cy.origin(Cypress.env("MCP_PROVIDER"), { args: _text }, (text) => {
     cy.contains(text).click();
   });

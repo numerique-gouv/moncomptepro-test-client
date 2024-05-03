@@ -1,7 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import { Issuer } from "openid-client";
-import cookieSession from "cookie-session";
+import session from "express-session";
 import morgan from "morgan";
 import * as crypto from "crypto";
 
@@ -13,10 +13,11 @@ const app = express();
 
 app.set("view engine", "ejs");
 app.use(
-  cookieSession({
+  session({
     name: "mcp_session",
-    keys: ["key1", "key2"],
-  })
+    secret: process.env.SESSION_SECRET,
+    rolling: true,
+  }),
 );
 app.use(morgan("combined"));
 
@@ -86,14 +87,14 @@ app.post(
   "/select-organization",
   getAuthorizationControllerFactory({
     prompt: "select_organization",
-  })
+  }),
 );
 
 app.post(
   "/update-userinfo",
   getAuthorizationControllerFactory({
     prompt: "update_userinfo",
-  })
+  }),
 );
 
 app.post(
@@ -103,7 +104,7 @@ app.post(
     prompt: "login",
     // alternatively, you can use the 'max_age: 0'
     // if so, claims parameter is not necessary as auth_time will be returned
-  })
+  }),
 );
 
 app.get(process.env.CALLBACK_URL, async (req, res, next) => {
@@ -120,7 +121,7 @@ app.get(process.env.CALLBACK_URL, async (req, res, next) => {
     req.session.userinfo = await client.userinfo(tokenSet.access_token);
     req.session.idtoken = tokenSet.claims();
     req.session.id_token_hint = tokenSet.id_token;
-
+    req.session.oauth2token = tokenSet;
     res.redirect("/");
   } catch (e) {
     next(e);
@@ -130,7 +131,7 @@ app.get(process.env.CALLBACK_URL, async (req, res, next) => {
 app.post("/logout", async (req, res, next) => {
   try {
     const id_token_hint = req.session.id_token_hint;
-    req.session = null;
+    req.session.destroy();
     const client = await getMcpClient();
     const redirectUrl = client.endSessionUrl({
       post_logout_redirect_uri: `${origin}/`,
