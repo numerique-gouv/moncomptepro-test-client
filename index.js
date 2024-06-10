@@ -71,6 +71,13 @@ const getAuthorizationControllerFactory = (extraParams) => {
         acr_values,
         nonce,
         state,
+        claims: {
+          id_token: {
+            amr: {
+              essential: true,
+            },
+          },
+        },
         ...extraParams,
       });
 
