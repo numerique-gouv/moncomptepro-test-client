@@ -107,10 +107,27 @@ app.post(
 app.post(
   "/force-login",
   getAuthorizationControllerFactory({
-    claims: { id_token: { auth_time: { essential: true } } },
+    claims: {
+      id_token: {
+        amr: { essential: true },
+        auth_time: { essential: true },
+      },
+    },
     prompt: "login",
     // alternatively, you can use the 'max_age: 0'
     // if so, claims parameter is not necessary as auth_time will be returned
+  }),
+);
+
+app.post(
+  "/force-2fa",
+  getAuthorizationControllerFactory({
+    claims: {
+      id_token: {
+        amr: { essential: true },
+        acr: { essential: true, value: "https://refeds.org/profile/mfa" },
+      },
+    },
   }),
 );
 
