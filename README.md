@@ -15,7 +15,7 @@ This tool is full configured using environment variables.
 Pull the image:
 
 ```
-docker pull ghcr.io/betagouv/moncomptepro-test-client
+docker pull ghcr.io/numerique-gouv/moncomptepro-test-client
 ```
 
 Run the container:
@@ -24,7 +24,7 @@ Run the container:
 docker run --rm \
 -p 3000:3000 \
 -e PORT=3000 \
-ghcr.io/betagouv/moncomptepro-test-client
+ghcr.io/numerique-gouv/moncomptepro-test-client
 ```
 
 ## Run it with Docker Compose
@@ -77,7 +77,7 @@ logout_callbacks: ["http://localhost:3000/"]
 authorized_scopes: openid email profile organization
 ```
 
-More clients are available at: https://github.com/betagouv/moncomptepro/blob/master/scripts/fixtures.sql
+More clients are available at: https://github.com/numerique-gouv/moncomptepro/blob/master/scripts/fixtures.sql
 
 ## Run Cypress test
 
