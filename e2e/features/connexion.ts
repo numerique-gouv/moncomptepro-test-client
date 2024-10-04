@@ -8,8 +8,8 @@ Given("je navigue sur la page", () => {
   cy.visit("/");
 });
 
-When("je clique sur le bouton MonComptePro", () => {
-  cy.get(".moncomptepro-button").click();
+When("je clique sur le bouton ProConnect", () => {
+  cy.get(".proconnect-button").click();
 });
 
 When("je suis redirigé sur {string}", (path: string) => {

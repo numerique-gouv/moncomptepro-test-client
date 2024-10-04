@@ -37,37 +37,23 @@
     <main>
         <h1><%= locals.title %></h1>
         <h2>Se connecter</h2>
-        <% if (locals.showAgentConnectButton === true) { %>
-            <div>
-                <form action="/login" method="post">
-                    <button class="proconnect-button">
-                        <span class="proconnect-sr-only">S’identifier avec ProConnect</span>
-                    </button>
-                </form>
-                <p>
-                    <a
-                        href="https://www.proconnect.gouv.fr/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title="Qu’est-ce que ProConnect ? - nouvelle fenêtre"
-                    >
-                        Qu’est-ce que ProConnect ?
-                    </a>
-                </p>
-            </div>
-        <% } else { %>
-            <div>
-                <form action="/login" method="post">
-                    <button id="login" class="moncomptepro-button" aria-label="S'identifier avec MonComptePro"></button>
-                </form>
-                <p>
-                    <a href="https://moncomptepro.beta.gouv.fr/" target="_blank" rel="noopener noreferrer"
-                       title="Qu’est-ce que MonComptePro ? - nouvelle fenêtre">
-                            Qu’est-ce que MonComptePro ?
-                        </a>
-                    </p>
-            </div>
-        <% } %>
+        <div>
+            <form action="/login" method="post">
+                <button class="proconnect-button">
+                    <span class="proconnect-sr-only">S’identifier avec ProConnect</span>
+                </button>
+            </form>
+            <p>
+                <a
+                    href="https://www.proconnect.gouv.fr/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Qu’est-ce que ProConnect ? - nouvelle fenêtre"
+                >
+                    Qu’est-ce que ProConnect ?
+                </a>
+            </p>
+        </div>
         <% if (locals.userinfo) { %>
             <h2>Information utilisateur</h2>
             <pre><code><%= locals.userinfo %></code></pre>
