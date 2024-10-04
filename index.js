@@ -125,7 +125,7 @@ app.post(
     claims: {
       id_token: {
         amr: { essential: true },
-        acr: { essential: true, value: "https://refeds.org/profile/mfa" },
+        acr: { essential: true, value: process.env.ACR_VALUE_FOR_2FA },
       },
     },
   }),
