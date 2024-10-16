@@ -22,7 +22,7 @@
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.21.1",
-    "express-session": "^1.18.0",
+    "express-session": "^1.18.1",
     "morgan": "^1.10.0",
     "openid-client": "^5.7.0"
   },
