@@ -22,6 +22,8 @@ app.use(
 );
 app.use(morgan("combined"));
 
+const removeNullValues = (obj) => Object.entries(obj).reduce((a,[k,v]) => (v ? (a[k]=v, a) : a), {})
+
 const getMcpClient = async () => {
   const mcpIssuer = await Issuer.discover(process.env.MCP_PROVIDER);
 
@@ -79,12 +81,12 @@ const getAuthorizationControllerFactory = (extraParams) => {
       req.session.state = state;
       req.session.nonce = nonce;
 
-      const redirectUrl = client.authorizationUrl({
+      const redirectUrl = client.authorizationUrl(removeNullValues({
         nonce,
         state,
         ...AUTHORIZATION_DEFAULT_PARAMS,
         ...extraParams,
-      });
+      }));
 
       res.redirect(redirectUrl);
     } catch (e) {
