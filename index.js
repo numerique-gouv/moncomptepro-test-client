@@ -4,6 +4,7 @@ import { Issuer } from "openid-client";
 import session from "express-session";
 import morgan from "morgan";
 import * as crypto from "crypto";
+import bodyParser from "body-parser";
 
 const port = parseInt(process.env.PORT, 10) || 3000;
 const origin = `${process.env.HOST}`;
@@ -35,6 +36,24 @@ const getMcpClient = async () => {
   });
 };
 
+const acr_values = process.env.ACR_VALUES
+  ? process.env.ACR_VALUES.split(",")
+  : null;
+const login_hint = process.env.LOGIN_HINT || null;
+const scope = process.env.MCP_SCOPES;
+const AUTHORIZATION_DEFAULT_PARAMS = {
+  scope,
+  login_hint,
+  acr_values,
+  claims: {
+    id_token: {
+      amr: {
+        essential: true,
+      },
+    },
+  },
+};
+
 app.get("/", async (req, res, next) => {
   try {
     res.render("index", {
@@ -43,6 +62,7 @@ app.get("/", async (req, res, next) => {
       userinfo: JSON.stringify(req.session.userinfo, null, 2),
       idtoken: JSON.stringify(req.session.idtoken, null, 2),
       oauth2token: JSON.stringify(req.session.oauth2token, null, 2),
+      defaultParamsValue: JSON.stringify(AUTHORIZATION_DEFAULT_PARAMS, null, 2),
     });
   } catch (e) {
     next(e);
@@ -53,11 +73,6 @@ const getAuthorizationControllerFactory = (extraParams) => {
   return async (req, res, next) => {
     try {
       const client = await getMcpClient();
-      const acr_values = process.env.ACR_VALUES
-        ? process.env.ACR_VALUES.split(",")
-        : null;
-      const login_hint = process.env.LOGIN_HINT || null;
-      const scope = process.env.MCP_SCOPES;
       const nonce = crypto.randomBytes(16).toString("hex");
       const state = crypto.randomBytes(16).toString("hex");
 
@@ -65,18 +80,9 @@ const getAuthorizationControllerFactory = (extraParams) => {
       req.session.nonce = nonce;
 
       const redirectUrl = client.authorizationUrl({
-        scope,
-        login_hint,
-        acr_values,
         nonce,
         state,
-        claims: {
-          id_token: {
-            amr: {
-              essential: true,
-            },
-          },
-        },
+        ...AUTHORIZATION_DEFAULT_PARAMS,
         ...extraParams,
       });
 
@@ -128,6 +134,18 @@ app.post(
       },
     },
   }),
+);
+
+app.post(
+  "/custom-connection",
+  bodyParser.urlencoded({ extended: false }),
+  (req, res, next) => {
+    console.log(req.body['custom-params'])
+    const customParams = JSON.parse(req.body['custom-params'])
+    console.dir(customParams, { depth: null });
+
+    return getAuthorizationControllerFactory(customParams)(req, res, next);
+  },
 );
 
 app.get(process.env.CALLBACK_URL, async (req, res, next) => {

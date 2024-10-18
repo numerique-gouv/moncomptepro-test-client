@@ -86,6 +86,20 @@
         <form action="/force-2fa" method="post">
             <button id="force-2fa">Forcer une connexion a deux facteurs</button>
         </form>
+        <br>
+        <details>
+            <summary id="open-custom-configuration">Usage avancé</summary>
+
+            <form action="/custom-connection" method="post">
+                <textarea
+                    name="custom-params"
+                    cols="50"
+                    rows="12"
+                ><%= locals.defaultParamsValue %></textarea>
+                <br>
+                <button id="custom-connection">Connexion personnalisée</button>
+            </form>
+        </details>
     </main>
     <footer>
         <p>Source: <a href="https://github.com/numerique-gouv/moncomptepro-test-client">github.com/numerique-gouv/moncomptepro-test-client</a></p>
