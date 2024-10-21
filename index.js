@@ -142,9 +142,7 @@ app.post(
   "/custom-connection",
   bodyParser.urlencoded({ extended: false }),
   (req, res, next) => {
-    console.log(req.body['custom-params'])
     const customParams = JSON.parse(req.body['custom-params'])
-    console.dir(customParams, { depth: null });
 
     return getAuthorizationControllerFactory(customParams)(req, res, next);
   },
