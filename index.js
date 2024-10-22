@@ -65,6 +65,7 @@ app.get("/", async (req, res, next) => {
       idtoken: JSON.stringify(req.session.idtoken, null, 2),
       oauth2token: JSON.stringify(req.session.oauth2token, null, 2),
       defaultParamsValue: JSON.stringify(AUTHORIZATION_DEFAULT_PARAMS, null, 2),
+      showBetaFeatures: process.env.SHOW_BETA_FEATURES === "True",
     });
   } catch (e) {
     next(e);
