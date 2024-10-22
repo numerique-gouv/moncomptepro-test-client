@@ -71,22 +71,24 @@
             <button id="logout">Se déconnecter</button>
         </form>
         <br>
-        <form action="/select-organization" method="post">
-            <button id="select-organization">Changer d’organisation</button>
-        </form>
-        <br>
-        <form action="/update-userinfo" method="post">
-            <button id="update-userinfo">Mettre à jour mes informations</button>
-        </form>
-        <br>
-        <form action="/force-login" method="post">
-            <button id="force-login">Forcer une reconnexion</button>
-        </form>
-        <br>
-        <form action="/force-2fa" method="post">
-            <button id="force-2fa">Forcer une connexion a deux facteurs</button>
-        </form>
-        <br>
+        <% if (locals.showBetaFeatures) { %>
+            <form action="/select-organization" method="post">
+                <button id="select-organization">Changer d’organisation</button>
+            </form>
+            <br>
+            <form action="/update-userinfo" method="post">
+                <button id="update-userinfo">Mettre à jour mes informations</button>
+            </form>
+            <br>
+            <form action="/force-login" method="post">
+                <button id="force-login">Forcer une reconnexion</button>
+            </form>
+            <br>
+            <form action="/force-2fa" method="post">
+                <button id="force-2fa">Forcer une connexion a deux facteurs</button>
+            </form>
+            <br>
+        <% } %>
         <details>
             <summary id="open-custom-configuration">Usage avancé</summary>
 
